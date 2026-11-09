@@ -1,0 +1,8 @@
+node_modules/
+.next/
+.env
+.env.*
+!.env.example
+migrasi-wp/export/
+*.log
+.DS_Store
