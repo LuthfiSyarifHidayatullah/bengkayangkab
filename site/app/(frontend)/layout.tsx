@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import './globals.css'
-import { getCategories } from '@/lib/wp'
+import { getCategories } from '@/lib/data'
+
+// Data diambil dari database saat diminta, bukan saat build.
+export const dynamic = 'force-dynamic'
 
 const NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'Kabupaten Bengkayang'
 
@@ -15,7 +18,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   try {
     cats = (await getCategories()).slice(0, 6)
   } catch {
-    /* menu tetap tampil walau WordPress sedang tidak bisa dijangkau */
+    /* menu tetap tampil walau database belum siap */
   }
   return (
     <html lang="id">
@@ -31,7 +34,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Link href="/berita">Berita</Link>
               {cats.map((c) => (
                 <Link key={c.id} href={`/kategori/${encodeURIComponent(c.slug)}`}>
-                  {c.name.replace(/&amp;/g, '&')}
+                  {c.name}
                 </Link>
               ))}
             </nav>

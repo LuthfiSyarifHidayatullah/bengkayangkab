@@ -1,24 +1,25 @@
 import Link from 'next/link'
 import PostCard from '@/components/PostCard'
-import { beritaHref, decode, formatDate, getCategories, getPosts, plain, postImage } from '@/lib/wp'
+import { beritaHref, formatDate, getCategories, getPosts } from '@/lib/data'
 
 export default async function Home() {
   const [{ data: posts }, cats] = await Promise.all([getPosts({ perPage: 10 }), getCategories().catch(() => [])])
   const [hero, ...rest] = posts
-  const heroImg = hero && postImage(hero)
 
   return (
     <>
       <section className="container hero-section">
-        {hero && (
+        {hero ? (
           <Link href={beritaHref(hero.slug)} className="hero-card">
-            {heroImg && <img src={heroImg} alt="" />}
+            {hero.image && <img src={hero.image} alt="" />}
             <div className="hero-text">
               <time dateTime={hero.date}>{formatDate(hero.date)}</time>
-              <h1>{decode(hero.title.rendered)}</h1>
-              <p>{plain(hero.excerpt.rendered).slice(0, 180)}</p>
+              <h1>{hero.title}</h1>
+              <p>{hero.excerpt.slice(0, 180)}</p>
             </div>
           </Link>
+        ) : (
+          <p>Belum ada berita. Tambahkan lewat <Link href="/admin">panel admin</Link>.</p>
         )}
       </section>
 
@@ -42,7 +43,7 @@ export default async function Home() {
           <div className="chips">
             {cats.map((c) => (
               <Link key={c.id} href={`/kategori/${encodeURIComponent(c.slug)}`} className="chip">
-                {decode(c.name)} <small>{c.count}</small>
+                {c.name} <small>{c.count}</small>
               </Link>
             ))}
           </div>

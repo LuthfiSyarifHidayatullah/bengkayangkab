@@ -1,21 +1,35 @@
 import Link from 'next/link'
-import { WPPost, decode, formatDate, postCategories, postImage } from '@/lib/wp'
+import { RichText } from '@payloadcms/richtext-lexical/react'
+import { Page, Post, formatDate } from '@/lib/data'
 
-export default function ArticleView({ post }: { post: WPPost }) {
-  const img = postImage(post)
+function Body({ html, richText }: { html?: string; richText?: any }) {
+  if (richText) return <div className="content"><RichText data={richText} /></div>
+  return <div className="content" dangerouslySetInnerHTML={{ __html: html || '' }} />
+}
+
+export function PageView({ page }: { page: Page }) {
+  return (
+    <article className="container article">
+      <h1>{page.title}</h1>
+      <Body html={page.html} richText={page.richText} />
+    </article>
+  )
+}
+
+export default function ArticleView({ post }: { post: Post }) {
   return (
     <article className="container article">
       <div className="meta">
-        {postCategories(post).map((c) => (
+        {post.categories.map((c) => (
           <Link key={c.id} href={`/kategori/${encodeURIComponent(c.slug)}`} className="badge">
-            {decode(c.name)}
+            {c.name}
           </Link>
         ))}
         <time dateTime={post.date}>{formatDate(post.date)}</time>
       </div>
-      <h1>{decode(post.title.rendered)}</h1>
-      {img && <img className="hero" src={img} alt="" />}
-      <div className="content" dangerouslySetInnerHTML={{ __html: post.content.rendered }} />
+      <h1>{post.title}</h1>
+      {post.image && <img className="hero" src={post.image} alt="" />}
+      <Body html={post.html} richText={post.richText} />
     </article>
   )
 }

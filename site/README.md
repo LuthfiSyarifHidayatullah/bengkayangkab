@@ -1,29 +1,36 @@
-# Situs Kabupaten Bengkayang (Next.js)
+# Situs + Admin Panel Kabupaten Bengkayang
 
-Situs ini membaca berita, halaman, dan kategori **langsung dari API WordPress** (`WP_URL`). Data di-cache 5 menit.
+Satu aplikasi Next.js dengan Payload CMS dan PostgreSQL.
+- **Situs publik**: `/`, `/berita`, `/berita/[slug]`, `/kategori/[slug]`, dan `/[slug]` (URL lama WordPress).
+- **Admin panel**: `/admin`. Tambah, ubah, dan hapus berita, halaman, kategori, dan upload foto/PDF, tanpa WordPress.
 
-## Menjalankan
+## 1. Persiapan
+Butuh Node.js 22.23.4+ dan Docker (untuk PostgreSQL).
 ```bash
 cd site
-cp .env.example .env.local     # Windows: copy .env.example .env.local
+docker compose up -d                     # menyalakan PostgreSQL
+copy .env.example .env                   # Mac/Linux: cp
+# edit .env: ganti PAYLOAD_SECRET dengan string acak panjang
 npm install
-npm run dev                    # http://localhost:3000
 ```
 
-Produksi:
+## 2. Jalankan
 ```bash
-npm run build
-npm start
+npm run dev
 ```
+- Admin: http://localhost:3000/admin. Saat pertama dibuka, Anda diminta membuat **akun admin pertama**.
+- Situs: http://localhost:3000
 
-## Halaman
-| URL | Isi |
-|---|---|
-| `/` | Berita utama, berita terbaru, kategori |
-| `/berita` | Daftar berita + pencarian (`?q=`) + paginasi |
-| `/berita/[slug]` | Detail berita |
-| `/kategori/[slug]` | Berita per kategori |
-| `/[slug]` | URL lama WordPress (berita atau halaman) |
+Jika admin menampilkan error "importMap", jalankan `npm run generate:importmap` lalu ulangi `npm run dev`.
 
-## Batasan versi ini
-Isi masih **bergantung pada WordPress**. Jika WordPress dimatikan, situs ini kosong, dan konten baru masih harus ditulis lewat WordPress. Tahap berikutnya adalah menambahkan Payload CMS dan database sendiri (lihat `../payload-kit`) agar konten baru ditulis di sistem baru.
+## 3. Impor data WordPress lama
+```bash
+# di folder ../migrasi-wp (sekali saja)
+set SKIP_MEDIA=1 && node export-wp.mjs
+# lalu di folder site
+npm run import:wp
+```
+Aman diulang, tidak membuat data ganda. Gambar lama sementara masih memakai alamat WordPress lama (lihat bagian media di README utama).
+
+## Menulis berita baru
+Admin → **Berita** → **Create New** → isi judul, slug, tanggal, kategori, gambar utama, dan isi berita → **Publish**. Berita langsung muncul di situs.

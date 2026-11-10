@@ -2,13 +2,13 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import PostCard from '@/components/PostCard'
 import Pagination from '@/components/Pagination'
-import { decode, getCategoryBySlug, getPosts } from '@/lib/wp'
+import { getCategoryBySlug, getPosts } from '@/lib/data'
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ page?: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const cat = await getCategoryBySlug(decodeURIComponent((await params).slug))
-  return { title: cat ? decode(cat.name) : 'Kategori' }
+  return { title: cat ? cat.name : 'Kategori' }
 }
 
 export default async function KategoriPage({ params, searchParams }: Props) {
@@ -20,7 +20,7 @@ export default async function KategoriPage({ params, searchParams }: Props) {
 
   return (
     <div className="container">
-      <h1 className="page-title">{decode(cat.name)}</h1>
+      <h1 className="page-title">{cat.name}</h1>
       <div className="grid">
         {posts.map((p) => (
           <PostCard key={p.id} post={p} />

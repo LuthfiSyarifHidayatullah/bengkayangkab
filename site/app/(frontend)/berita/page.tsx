@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import PostCard from '@/components/PostCard'
 import Pagination from '@/components/Pagination'
-import { getPosts } from '@/lib/wp'
+import { getPosts } from '@/lib/data'
 
 export const metadata: Metadata = { title: 'Berita' }
 
